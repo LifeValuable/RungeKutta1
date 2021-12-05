@@ -1,0 +1,45 @@
+﻿  RungeKuttaDlg.cpp
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(92,61): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(92,29): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(93,61): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(93,29): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(94,41): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(94,17): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(95,42): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(95,17): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(102,61): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(102,29): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(103,61): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(103,29): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(104,41): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(104,17): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(105,42): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(105,17): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(141,113): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(141,76): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(144,118): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(144,31): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(161,22): warning C4018: <: несоответствие типов со знаком и без знака
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(212,26): warning C4244: аргумент: преобразование "_Ty" в "int", возможна потеря данных
+          with
+          [
+              _Ty=long double
+          ]
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(212,20): warning C4244: аргумент: преобразование "_Ty" в "int", возможна потеря данных
+          with
+          [
+              _Ty=long double
+          ]
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(213,34): warning C4244: аргумент: преобразование "_Ty" в "int", возможна потеря данных
+          with
+          [
+              _Ty=long double
+          ]
+D:\Студия\RungeKutta\RungeKutta\Drawer.h(213,24): warning C4244: аргумент: преобразование "_Ty" в "int", возможна потеря данных
+          with
+          [
+              _Ty=long double
+          ]
+D:\Студия\RungeKutta\RungeKutta\RungeKuttaDlg.cpp(203,18): warning C4101: a2: неиспользованная локальная переменная
+D:\Студия\RungeKutta\RungeKutta\RungeKuttaDlg.cpp(203,15): warning C4101: a1: неиспользованная локальная переменная
+  RungeKutta.vcxproj -> D:\Студия\RungeKutta\Debug\RungeKutta.exe
