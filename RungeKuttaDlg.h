@@ -40,7 +40,8 @@ protected:
 public:
 	afx_msg void Solve(); //функция нажатия кнопки "Решить"
 	double x_max; //максимальное значение X
-	BOOL control; //контроль максимального значения X
+	BOOL controlx; //контроль максимального значения X
+	BOOL controleps; //контроль eps
 	double h; //величина шага
 	int n_max; //максимальное количество шагов
 	int n; //количество шагов
@@ -48,6 +49,9 @@ public:
 	CListBox list; //список для отображения значений
 	Drawer U1; //объект класса drawer для отрисовки графика u1 (x)
 	Drawer U2; //объект класса drawer для отрисовки графика u2 (x)
+	Drawer U1U2; //объект класса drawer для отрисовки графика u1 (x), u2 (x)
+	Drawer E1E2; //объект класса drawer для отрисовки графика E1,E2
 	afx_msg void OnBnClickedCheck1();
+	afx_msg void OnBnClickedCheckeps();
 };
 

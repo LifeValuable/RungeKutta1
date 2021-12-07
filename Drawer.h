@@ -47,7 +47,7 @@ public:
 
 	//функция для отрисовки сетки
 
-	void DrawGrid(vector<long double> y_first_graph, int typefunc, vector<long double> x_first_graph, int N, long double y1_min, long double y1_max, long double y2_min, long double y2_max)
+	void DrawGrid(vector<long double> y_first_graph, int typefunc, vector<long double> x_first_graph, int N, long double y_min, long double y_max)
 	{
 		if (!init) return;
 
@@ -111,21 +111,11 @@ public:
 		long double data_y_min(0), data_y_max(0);
 		long double data_x_min(0), data_x_max(0);
 
-		switch (typefunc)
-		{
-		case 1:
-			data_y_min = y1_min;
-			data_y_max = y1_max;
-			data_x_min = x_first_graph[0];
-			data_x_max = x_first_graph[N-1];
-			break;
-		case 2:
-			data_y_min = y2_min;
-			data_y_max = y2_max;
-			data_x_min = x_first_graph[0];
-			data_x_max = x_first_graph[N - 1];
-			break;
-		}
+		data_y_min = y_min;
+		data_y_max = y_max;
+		data_x_min = x_first_graph[0];
+		data_x_max = x_first_graph[N - 1];
+
 		//конвертируем данные для корректного отрисовывания
 		vector<long double> y = convert_range(y_first_graph, actual_top, actual_bottom, data_y_max, data_y_min);
 		vector<long double> x = convert_range(x_first_graph, actual_right, actual_left, data_x_max, data_x_min);
@@ -134,41 +124,74 @@ public:
 		memDC.SetTextColor(RGB(0, 0, 0));
 
 		//подписываем значения на сетке
-		for (int i = 0; i < grid_size / 2 + 1; i++)
-		{
-			CString str;
-			str.Format(L"%.4f", data_x_min + i * (data_x_max - data_x_min) / (grid_size / 2));
-			memDC.TextOutW(actual_left + (double)i * actual_width / (grid_size / 2) - bottom_keys_padding, actual_bottom + bottom_keys_padding / 2, str);
+		switch (typefunc) {
+		case 1:
+			for (int i = 0; i < grid_size / 2 + 1; i++)
+			{
+				CString str;
+				str.Format(L"%.4f", data_x_min + i * (data_x_max - data_x_min) / (grid_size / 2));
+				memDC.TextOutW(actual_left + (double)i * actual_width / (grid_size / 2) - bottom_keys_padding, actual_bottom + bottom_keys_padding / 2, str);
 
-			str.Format(L"%.1f", data_y_min + i * (data_y_max - data_y_min) / (grid_size / 2));
-			memDC.TextOutW(actual_left - 1.5 * left_keys_padding, actual_bottom - (double)i * actual_height / (grid_size / 2) - bottom_keys_padding, str);
+				str.Format(L"%.1f", data_y_min + i * (data_y_max - data_y_min) / (grid_size / 2));
+				memDC.TextOutW(actual_left - 1.5 * left_keys_padding, actual_bottom - (double)i * actual_height / (grid_size / 2) - bottom_keys_padding, str);
+			}
+			break;
+		case 2:
+			for (int i = 0; i < grid_size / 2 + 1; i++)
+			{
+				CString str;
+				str.Format(L"%.4f", data_x_min + i * (data_x_max - data_x_min) / (grid_size / 2));
+				memDC.TextOutW(actual_left + (double)i * actual_width / (grid_size / 2) - bottom_keys_padding, actual_bottom + bottom_keys_padding / 2, str);
+
+				str.Format(L"%.1f", data_y_min + i * (data_y_max - data_y_min) / (grid_size / 2));
+				memDC.TextOutW(actual_left - 1.5 * left_keys_padding, actual_bottom - (double)i * actual_height / (grid_size / 2) - bottom_keys_padding, str);
+			}
+			break;
+		case 3:
+			for (int i = 0; i < grid_size / 2 + 1; i++)
+			{
+				CString str;
+				str.Format(L"%.4f", data_x_min + i * (data_x_max - data_x_min) / (grid_size / 2));
+				memDC.TextOutW(actual_left + (double)i * actual_width / (grid_size / 2) - bottom_keys_padding, actual_bottom + bottom_keys_padding / 2, str);
+
+				str.Format(L"%.e", data_y_min + i * (data_y_max - data_y_min) / (grid_size / 2));
+				memDC.TextOutW(actual_left - 1.5 * left_keys_padding, actual_bottom - (double)i * actual_height / (grid_size / 2) - bottom_keys_padding, str);
+			}
+			break;
 		}
+		
 
 
 		dc->BitBlt(0, 0, frame.Width(), frame.Height(), &memDC, 0, 0, SRCCOPY);
 	}
 	
 	//функция отрисовки графиков
-	void DrawPlot(vector<long double>& y_first_graph, int typefunc, vector<long double>& x_first_graph, int N, long double y1_min, long double y1_max, long double y2_min, long double y2_max)
+	void DrawPlot(vector<long double>& y_first_graph, int typefunc, vector<long double>& x_first_graph, int N, long double y_min, long double y_max)
 	{
 		if (!init) return;
 
 		if (y_first_graph.empty()) return;
 
-		if (x_first_graph.size() != y_first_graph.size())
+		/*if (x_first_graph.size() != y_first_graph.size())
 		{
 			x_first_graph.resize(y_first_graph.size());
 			for (int i = 0; i < x_first_graph.size(); i++)
 			{
 				x_first_graph[i] = i;
 			}
-		}
+		}*/
 
 		//кисти для рисовки графиков
-		CPen data_pen(PS_SOLID, 2, RGB(255, 0, 0));
+		CPen RedPen(PS_SOLID, 2, RGB(255, 0, 0));
+		CPen BluePen(PS_SOLID, 2, RGB(0, 0, 255));
 
+		memDC.SelectObject(&BluePen);
 
-		memDC.SelectObject(&data_pen);
+		switch (typefunc) {
+		case 2:
+			memDC.SelectObject(&RedPen);
+		}
+
 		//переменные для корректной отрисовки
 		double padding = 30;
 		double left_keys_padding = 20;
@@ -184,27 +207,14 @@ public:
 
 		long double data_y_min(0), data_y_max(0);
 		long double data_x_min(0), data_x_max(0);
-		//выбираем подходящие параметры графика
-		switch (typefunc)
-		{
-		case 1:
-			data_y_min = y1_min;
-			data_y_max = y1_max;
-			data_x_min = x_first_graph[0];
-			data_x_max = x_first_graph[N - 1];
-			break;
-		case 2:
-			data_y_min = y2_min;
-			data_y_max = y2_max;
-			data_x_min = x_first_graph[0];
-			data_x_max = x_first_graph[N - 1];
-			break;
-		}
+		
+		data_y_min = y_min;
+		data_y_max = y_max;
+		data_x_min = x_first_graph[0];
+		data_x_max = x_first_graph[N - 1];
 
-
-		//конвертируем данные для корректного отрисовывания
-		vector<long double> y = convert_range(y_first_graph, actual_top, actual_bottom, data_y_max, data_y_min);
-		vector<long double> x = convert_range(x_first_graph, actual_right, actual_left, data_x_max, data_x_min);
+		vector<long double> y = convert_range(y_first_graph, actual_top, actual_bottom, data_y_max, data_y_min);;
+		vector<long double> x = convert_range(x_first_graph, actual_right, actual_left, data_x_max, data_x_min);;
 
 		//рисуем график
 		for (int i = 0; i < N - 1; i++)

@@ -3,7 +3,7 @@
 //
 
 #include "pch.h"
-#include "math.h"
+#include <cmath>
 #include <algorithm>
 #include "framework.h"
 #include "RungeKutta.h"
@@ -61,7 +61,8 @@ CRungeKuttaDlg::CRungeKuttaDlg(CWnd* pParent /*=nullptr*/)
 	, h(0.00001)
 	, eps(0.001)
 	, x_max (0.005)
-	, control (FALSE)
+	, controlx (FALSE)
+	, controleps (FALSE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -83,6 +84,7 @@ BEGIN_MESSAGE_MAP(CRungeKuttaDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDOK, &CRungeKuttaDlg::Solve)
 	ON_BN_CLICKED(IDC_CHECK1, &CRungeKuttaDlg::OnBnClickedCheck1)
+	ON_BN_CLICKED(IDC_CHECKEPS, &CRungeKuttaDlg::OnBnClickedCheckeps)
 END_MESSAGE_MAP()
 
 
@@ -130,6 +132,9 @@ BOOL CRungeKuttaDlg::OnInitDialog()
 
 	U1.Create(GetDlgItem(IDC_u1)->GetSafeHwnd()); //передача hwnd для рисования графика
 	U2.Create(GetDlgItem(IDC_u2)->GetSafeHwnd()); //передача hwnd для рисования графика
+	U1U2.Create(GetDlgItem(IDC_u1u2)->GetSafeHwnd()); //передача hwnd для рисования графика
+	E1E2.Create(GetDlgItem(IDC_E1E2)->GetSafeHwnd()); //передача hwnd для рисования графика
+
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
 
@@ -187,6 +192,9 @@ HCURSOR CRungeKuttaDlg::OnQueryDragIcon()
 vector <long double> u1; //контейнер хранения значений u1
 vector <long double> u2; //контейнер хранения значений u2
 vector <long double> x;  //контейнер хранения значений x
+vector <long double> e1;  //контейнер хранения значений E1
+vector <long double> e2;  //контейнер хранения значений E2
+
 
 //точное решение системы дифференциальных уравнений
 long double uu1(long double x) {
@@ -196,8 +204,8 @@ long double uu2(long double x) {
 	return 3 * exp(-1000 * x) + 10 * exp(-0.01 * x);
 }
 
-//функция метода Рунге Кутта 
-void RungeKutta(vector <long double>& u1, vector <long double>& u2, vector <long double>& x, double h, double eps, int&i) {
+//функция метода Рунге Кутта с контролем eps
+void RungeKuttawithcontrol(vector <long double>& u1, vector <long double>& u2, vector <long double>& x, double h, double eps, int&i) {
 		if (x.size() == i+2) x[i + 1] = x[i] + h;
 		else x.push_back(x[i] + h);
 		long double a1,a2, k1u1, k2u1, k1u2, k2u2, a(-500.005), b(499.995), H((3 + sqrt(3)) * h / 6), sqrt1(-sqrt(3) / 3), sqrt2((3 + sqrt(3)) / 6);//коэффициенты метода и переменные для упрощения записи
@@ -242,8 +250,7 @@ void RungeKutta(vector <long double>& u1, vector <long double>& u2, vector <long
 			tempu2 = tempu2 + h * (k1u2 + k2u2) / 2;
 		}
 		if (abs(tempu1 - u1[i + 1]) > eps || abs(tempu2 - u2[i + 1] > eps)) {
-			//i--;
-			RungeKutta(u1, u2, x, h, eps, i);
+			RungeKuttawithcontrol(u1, u2, x, h, eps, i);
 			i--;
 		}
 		h *= 4;
@@ -251,6 +258,56 @@ void RungeKutta(vector <long double>& u1, vector <long double>& u2, vector <long
 		
 		i++;
 }
+
+
+//функция метода Рунге Кутта без контроля eps
+void RungeKuttawithoutcontrol(vector <long double>& u1, vector <long double>& u2, vector <long double>& x, double h, int& i) {
+	if (x.size() == i + 2) x[i + 1] = x[i] + h;
+	else x.push_back(x[i] + h);
+	long double a1, a2, k1u1, k2u1, k1u2, k2u2, a(-500.005), b(499.995), H((3 + sqrt(3)) * h / 6), sqrt1(-sqrt(3) / 3), sqrt2((3 + sqrt(3)) / 6);//коэффициенты метода и переменные для упрощения записи
+	//коэффициенты получены решением системы линейных уравнений 
+
+	k1u1 = -(a * a * H * u1[i] - a * u1[i] - b * b * H * u1[i] - b * u2[i]) / (a * a * H * H - 2 * a * H - b * b * H * H + 1);
+	k1u2 = (-H * a * a * u2[i] + a * u2[i] + b * b * H * u2[i] + b * u1[i]) / (a * a * H * H - 2 * a * H - b * b * H * H + 1);
+	k2u1 = -((-a * a * a * a * h * h * H * sqrt1 * sqrt2 * u1[i] + a * a * a * a * h * H * H * sqrt2 * u1[i] + a * a * h * h * a * sqrt1 * sqrt2 * u1[i] +
+		a * a * a * h * H * sqrt1 * u1[i] - 2 * a * a * a * h * H * sqrt2 * u1[i] - a * a * a * H * H * u1[i] + 2 * a * b * h * a * b * h * H * sqrt1 * sqrt2 * u1[i] -
+		2 * a * b * H * a * b * H * h * sqrt2 * u1[i] + a * a * b * h * h * sqrt1 * sqrt2 * u2[i] + a * a * b * h * H * sqrt1 * u2[i] - a * a * b * H * H * u2[i] -
+		a * a * h * sqrt1 * u1[i] + a * a * h * sqrt2 * u1[i] + 2 * a * a * H * u1[i] - a * b * b * h * h * sqrt1 * sqrt2 * u1[i] - a * b * b * h * H * sqrt1 * u1[i] +
+		2 * a * b * b * h * H * sqrt2 * u1[i] + a * b * b * H * H * u1[i] - 2 * a * b * h * sqrt1 * u2[i] + 2 * a * b * H * u2[i] - a * u1[i] -
+		b * b * b * b * h * h * H * sqrt1 * sqrt2 * u1[i] + b * b * b * b * h * H * H * sqrt2 * u1[i] - b * b * b * h * h * sqrt1 * sqrt2 * u2[i] -
+		b * b * b * h * H * sqrt1 * u2[i] + b * b * b * H * H * u2[i] - b * b * h * sqrt1 * u1[i] - b * b * h * sqrt2 * u1[i] - b * u2[i]) /
+		((a * a * H * H - 2 * a * H - b * b * H * H + 1) * (a * a * h * h * sqrt2 * sqrt2 - 2 * a * h * sqrt2 - b * b * h * h * sqrt2 * sqrt2 + 1)));
+	k2u2 = -((-a * a * a * a * h * h * H * sqrt1 * sqrt2 * u2[i] + a * a * a * a * h * H * H * sqrt2 * u2[i] + a * a * h * h * a * sqrt1 * sqrt2 * u2[i] +
+		a * a * a * h * H * sqrt1 * u2[i] - 2 * a * a * a * h * H * sqrt2 * u2[i] - a * a * a * H * H * u2[i] + 2 * a * b * h * a * b * h * H * sqrt1 * sqrt2 * u2[i] -
+		2 * a * b * H * a * b * H * h * sqrt2 * u2[i] + a * a * b * h * h * sqrt1 * sqrt2 * u1[i] + a * a * b * h * H * sqrt1 * u1[i] - a * a * b * H * H * u1[i] -
+		a * a * h * sqrt1 * u2[i] + a * a * h * sqrt2 * u2[i] + 2 * a * a * H * u2[i] - a * b * b * h * h * sqrt1 * sqrt2 * u2[i] - a * b * b * h * H * sqrt1 * u2[i] +
+		2 * a * b * b * h * H * sqrt2 * u2[i] + a * b * b * H * H * u2[i] - 2 * a * b * h * sqrt1 * u1[i] + 2 * a * b * H * u1[i] - a * u2[i] -
+		b * b * b * b * h * h * H * sqrt1 * sqrt2 * u2[i] + b * b * b * b * h * H * H * sqrt2 * u2[i] - b * b * b * h * h * sqrt1 * sqrt2 * u1[i] -
+		b * b * b * h * H * sqrt1 * u1[i] + b * b * b * H * H * u1[i] - b * b * h * sqrt1 * u2[i] - b * b * h * sqrt2 * u2[i] - b * u1[i]) /
+		((a * a * H * H - 2 * a * H - b * b * H * H + 1) * (a * a * h * h * sqrt2 * sqrt2 - 2 * a * h * sqrt2 - b * b * h * h * sqrt2 * sqrt2 + 1)));
+	//записываем следующие значения u1
+	if (u1.size() == i + 2) u1[i + 1] = u1[i] + h * (k1u1 + k2u1) / 2;
+	else u1.push_back(u1[i] + h * (k1u1 + k2u1) / 2);
+
+	//записываем следующие значения u2
+	if (u2.size() == i + 2) u2[i + 1] = u2[i] + h * (k1u2 + k2u2) / 2;
+	else u2.push_back(u2[i] + h * (k1u2 + k2u2) / 2);
+	i++;
+}
+
+
+//функция для рассчета E1,E2
+void Getmistakes(vector <long double> u1, vector <long double> u2, vector <long double>& e1, vector <long double>& e2, vector <long double> x) {
+	for (int i = 0; i < u1.size(); i++) {
+		long double temp = u1[i] - uu1(x[i]);
+		e1.push_back(temp);
+	}
+	for (int i = 0; i < u2.size(); i++) {
+		long double temp = u2[i] - uu2(x[i]);
+		e2.push_back(temp);
+	}
+}
+
 
 
 void CRungeKuttaDlg::Solve()
@@ -268,20 +325,31 @@ void CRungeKuttaDlg::Solve()
 	x.reserve(n+1);
 
 	//создаем цикл для метода Рунге-Кутты
-	if (control == TRUE) {
+	if (controleps == TRUE) {//проверка на контроль eps
 		for (int i = 0; i < n;) {
-			RungeKutta(u1, u2, x, h, eps, i);
-			if (x[i] > x_max) {
-				n = i;
-				break;
+			if (controlx == TRUE) { //проверка на контроль x max
+				if (x[i] > x_max) {
+					n = i;
+					break;
+				}
 			}
+			RungeKuttawithcontrol(u1, u2, x, h, eps, i);
 		}
 	}
 	else {
 		for (int i = 0; i < n;) {
-			RungeKutta(u1, u2, x, h, eps, i);
+			if (controlx == TRUE) {
+				if (x[i] > x_max) {
+					n = i;
+					break;
+				}
+			RungeKuttawithoutcontrol(u1, u2, x, h, i);
+			}
 		}
 	}
+	//рассчитаем ошибки
+	Getmistakes(u1, u2, e1, e2, x);
+
 	//цикл записи данных в listbox
 	CString stroka(L"n");
 	for (int i = 0; i <  (int)abs(log10(h)) + 5; i++) {
@@ -310,9 +378,9 @@ void CRungeKuttaDlg::Solve()
 	stroka += "E2 ";
 
 	list.AddString(stroka);
-	for (int i = 0; i < n; i++) {
+	for (int i = 0; i <= n; i++) {
 		CString Str(L""), temp; //в эти строки будем записывать данные
-		//записываем в строку n с 5 знаками после запятой
+		//записываем в строку n 
 		temp.Format(_T("%.*f"), 0, (double)i);
 		Str += temp;
 		Str += "    ";
@@ -335,30 +403,42 @@ void CRungeKuttaDlg::Solve()
 		Str += temp;
 		Str += "    ";
 		//записываем в строку eps1
-		
-		if (i != 0)temp.Format(_T("%.e"), abs(u1[i] - uu1(x[i])));
-		else temp.Format(_T("%.e"), abs(u1[i] - uu1(x[i])));
+		temp.Format(_T("%.e"), e1[i]);
 		Str += temp;
 		Str += "    ";
 		//записываем в строку eps2
-		if (i != 0)temp.Format(_T("%.e"), abs(u2[i] - uu2(x[i])));
-		else temp.Format(_T("%.e"), abs(u2[i] - uu2(x[i])));
+		temp.Format(_T("%.e"), e2[i]);
 		Str += temp;
 		Str += "    ";
 		list.AddString(Str);
 	}
-	vector<long double>::iterator u1y_min, u1y_max, u2y_min, u2y_max;
-	u1y_max = std::max_element(u1.begin(), u1.end());
-	u2y_max = std::max_element(u2.begin(), u2.end());
-	u1y_min = std::min_element(u1.begin(), u1.end());
-	u2y_min = std::min_element(u2.begin(), u2.end());
+	//задаем ограничения на y_max, y_min для корректной отрисовки графиков
+	long double y_max, y_min;
 
 	//рисуем сетку и графики
-	U1.DrawGrid(u1, 1, x, n, floor(*u1y_min), ceil(*u1y_max), floor(*u2y_min), ceil(*u2y_max));
-	U2.DrawGrid(u2, 2, x, n, floor(*u1y_min), ceil(*u1y_max), floor(*u2y_min), ceil(*u2y_max));
-	U1.DrawPlot(u1, 1, x, n, floor(*u1y_min), ceil(*u1y_max), floor(*u2y_min), ceil(*u2y_max));
-	U2.DrawPlot(u2, 2, x, n, floor(*u1y_min), ceil(*u1y_max), floor(*u2y_min), ceil(*u2y_max));
+	y_max = *max_element(u1.begin(), u1.end());
+	y_min = *min_element(u1.begin(), u1.end());
+	U1.DrawGrid(u1, 1, x, n + 1, y_min, y_max);
+	U1.DrawPlot(u1, 1, x, n + 1, y_min, y_max);
 
+	y_max = *max_element(u2.begin(), u2.end());
+	y_min = *min_element(u2.begin(), u2.end());
+	U2.DrawGrid(u2, 2, x, n+1, y_min, y_max);
+	U2.DrawPlot(u2, 2, x, n+1, y_min, y_max);
+
+	y_max = *max_element(u2.begin(), u2.end());
+	y_min = *min_element(u1.begin(), u1.end());
+	U1U2.DrawGrid(u1, 1, x, n + 1, y_min, y_max);
+	U1U2.DrawPlot(u1, 1, x, n + 1, y_min, y_max);
+	U1U2.DrawPlot(u2, 2, x, n + 1, y_min, y_max);
+
+
+
+	y_max = *max_element(e1.begin(), e1.end());
+	y_min = *min_element(e2.begin(), e2.end());
+	E1E2.DrawGrid(e1, 3, x, n + 1, y_min, y_max);
+	E1E2.DrawPlot(e1, 3, x, n + 1, y_min, y_max);
+	E1E2.DrawPlot(e2, 2, x, n + 1, y_min, y_max);
 
 	n = n_max;
 
@@ -366,12 +446,20 @@ void CRungeKuttaDlg::Solve()
 	u1.clear();
 	u2.clear();
 	x.clear();	
+	e1.clear();
+	e2.clear();
 }
 
-
+//контроль xmax
 void CRungeKuttaDlg::OnBnClickedCheck1()
 {
-	// TODO: добавьте свой код обработчика уведомлений
-	if (control == FALSE) control = TRUE;
-	else control = FALSE;
+	if (controlx == FALSE) controlx = TRUE;
+	else controlx = FALSE;
+}
+
+//контроль eps
+void CRungeKuttaDlg::OnBnClickedCheckeps()
+{
+	if (controleps == FALSE) controleps = TRUE;
+	else controleps = FALSE;
 }
