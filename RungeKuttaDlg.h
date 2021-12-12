@@ -53,5 +53,7 @@ public:
 	Drawer E1E2; //объект класса drawer для отрисовки графика E1,E2
 	afx_msg void OnBnClickedCheck1();
 	afx_msg void OnBnClickedCheckeps();
+	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedHelp();
 };
 

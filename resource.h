@@ -2,6 +2,7 @@
 // Включаемый файл, созданный в Microsoft Visual C++.
 // Используется RungeKutta.rc
 //
+#define IDOK2                           2
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101
@@ -9,6 +10,7 @@
 #define IDR_MAINFRAME                   128
 #define IDB_BITMAP1                     133
 #define IDB_BITMAP2                     134
+#define IDD_HELP                        135
 #define IDC_1                           1000
 #define IDC_2                           1001
 #define IDC_3                           1002
@@ -24,19 +26,23 @@
 #define IDC_u1                          1013
 #define IDC_u2                          1014
 #define IDC_E1E2                        1015
-#define IDC_u3                          1016
 #define IDC_u1u2                        1016
 #define IDC_CHECK1                      1017
 #define IDC_CHECKEPS                    1018
 #define IDC_9                           1019
+#define ID_n                            1020
+#define ID_hmax                         1021
+#define ID_hmin                         1022
+#define ID_E1                           1023
+#define ID_E2                           1024
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

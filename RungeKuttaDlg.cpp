@@ -9,6 +9,7 @@
 #include "RungeKutta.h"
 #include "RungeKuttaDlg.h"
 #include "afxdialogex.h"
+#include "RHelpDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -85,6 +86,8 @@ BEGIN_MESSAGE_MAP(CRungeKuttaDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CRungeKuttaDlg::Solve)
 	ON_BN_CLICKED(IDC_CHECK1, &CRungeKuttaDlg::OnBnClickedCheck1)
 	ON_BN_CLICKED(IDC_CHECKEPS, &CRungeKuttaDlg::OnBnClickedCheckeps)
+	ON_BN_CLICKED(IDCANCEL, &CRungeKuttaDlg::OnBnClickedCancel)
+	ON_BN_CLICKED(ID_HELP, &CRungeKuttaDlg::OnBnClickedHelp)
 END_MESSAGE_MAP()
 
 
@@ -312,6 +315,13 @@ void Getmistakes(vector <long double> u1, vector <long double> u2, vector <long 
 
 void CRungeKuttaDlg::Solve()
 {
+
+	//очистка памяти
+	u1.clear();
+	u2.clear();
+	x.clear();
+	e1.clear();
+	e2.clear();
 	list.ResetContent(); //очистка лист
 	UpdateData(TRUE); //запишем в память значения n и h, введеные с экрана
 	n = n_max;
@@ -339,7 +349,7 @@ void CRungeKuttaDlg::Solve()
 	else {
 		for (int i = 0; i < n;) {
 			if (controlx == TRUE) {
-				if (x[i] > x_max) {
+				if (x[i] > x_max && i != 0) {
 					n = i;
 					break;
 				}
@@ -440,14 +450,7 @@ void CRungeKuttaDlg::Solve()
 	E1E2.DrawPlot(e1, 3, x, n + 1, y_min, y_max);
 	E1E2.DrawPlot(e2, 2, x, n + 1, y_min, y_max);
 
-	n = n_max;
 
-	//очистка памяти
-	u1.clear();
-	u2.clear();
-	x.clear();	
-	e1.clear();
-	e2.clear();
 }
 
 //контроль xmax
@@ -462,4 +465,30 @@ void CRungeKuttaDlg::OnBnClickedCheckeps()
 {
 	if (controleps == FALSE) controleps = TRUE;
 	else controleps = FALSE;
+}
+
+
+void CRungeKuttaDlg::OnBnClickedCancel()
+{
+	// TODO: добавьте свой код обработчика уведомлений
+	CDialogEx::OnCancel();
+}
+
+
+void CRungeKuttaDlg::OnBnClickedHelp()
+{
+	RHelpDlg nDlg;
+	if (n != 0) {
+		nDlg.E1 = *max_element(e1.begin(), e1.end());
+		nDlg.E2 = -*min_element(e2.begin(), e2.end());
+		nDlg.h_max = h;
+		nDlg.h_min = h;
+		for (int i = 0; i < n - 1; i++) {
+			if (x[i + 1] - x[i] > nDlg.h_max) nDlg.h_max = x[i + 1] - x[i];
+			if (x[i + 1] - x[i] < nDlg.h_min) nDlg.h_min = x[i + 1] - x[i];
+		}
+		nDlg.n = n;
+	}
+	nDlg.DoModal();
+	
 }
