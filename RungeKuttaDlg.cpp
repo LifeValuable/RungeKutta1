@@ -58,10 +58,10 @@ END_MESSAGE_MAP()
 
 CRungeKuttaDlg::CRungeKuttaDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_RUNGEKUTTA_DIALOG, pParent)
-	, n_max(10000)
-	, h(0.00001)
-	, eps(0.001)
-	, x_max (0.005)
+	, n_max(5000)
+	, h(0.001)
+	, eps(0.0000000000001)
+	, x_max (0.05)
 	, controlx (FALSE)
 	, controleps (FALSE)
 {
@@ -316,12 +316,7 @@ void Getmistakes(vector <long double> u1, vector <long double> u2, vector <long 
 void CRungeKuttaDlg::Solve()
 {
 
-	//очистка памяти
-	u1.clear();
-	u2.clear();
-	x.clear();
-	e1.clear();
-	e2.clear();
+	
 	list.ResetContent(); //очистка лист
 	UpdateData(TRUE); //запишем в память значения n и h, введеные с экрана
 	n = n_max;
@@ -343,6 +338,7 @@ void CRungeKuttaDlg::Solve()
 					break;
 				}
 			}
+			if (u2[i] <= u1[i]) h = 1;
 			RungeKuttawithcontrol(u1, u2, x, h, eps, i);
 		}
 	}
@@ -353,8 +349,9 @@ void CRungeKuttaDlg::Solve()
 					n = i;
 					break;
 				}
-			RungeKuttawithoutcontrol(u1, u2, x, h, i);
 			}
+			if (u2[i] <= u1[i]) h = 1;
+			RungeKuttawithoutcontrol(u1, u2, x, h, i);
 		}
 	}
 	//рассчитаем ошибки
@@ -406,10 +403,12 @@ void CRungeKuttaDlg::Solve()
 		Str += "    ";
 		//записываем в строку u1[i]
 		temp.Format(_T("%.*f"), (int)abs(log10(eps)) + 2, u1[i]);
+		if (u1[i] < 0.) temp.Format(_T("%.e"), u1[i]);
 		Str += temp;
 		Str += "    ";
 		//записываем в строку u2[i]
-		temp.Format(_T("%.*f"), (int)abs(log10(eps))+2, u2[i]);
+		temp.Format(_T("%.*f"), (int)abs(log10(eps)) + 2, u2[i]);
+		if (u2[i] < 0.) temp.Format(_T("%.e"), u2[i]);
 		Str += temp;
 		Str += "    ";
 		//записываем в строку eps1
@@ -450,7 +449,12 @@ void CRungeKuttaDlg::Solve()
 	E1E2.DrawPlot(e1, 3, x, n + 1, y_min, y_max);
 	E1E2.DrawPlot(e2, 2, x, n + 1, y_min, y_max);
 
-
+	//очистка памяти
+	u1.clear();
+	u2.clear();
+	x.clear();
+	e1.clear();
+	e2.clear();
 }
 
 //контроль xmax
